@@ -52,7 +52,7 @@ def login():
             message = f"Xəta: {e}"
         conn.close()
 
-    return render_template("myapp/templates/login.html", message=message)
+    return render_template("templates/login.html", message=message)
 
 if __name__ == "__main__":
     init_db()
