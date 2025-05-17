@@ -1,18 +1,21 @@
+import os
 import sqlite3
 from flask import Flask, request, render_template
 
 app = Flask(__name__)
 
 def init_db():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR,'users.db')
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))  
+    db_path = os.path.join(BASE_DIR, 'users.db')       
     conn = sqlite3.connect(db_path)
     c = conn.cursor()
+    
     c.execute('''CREATE TABLE IF NOT EXISTS users (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT NOT NULL,
                     password TEXT NOT NULL
                 )''')
+
     c.execute('''CREATE TABLE IF NOT EXISTS flags (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     flag TEXT NOT NULL
@@ -22,7 +25,6 @@ def init_db():
     if not c.fetchone():
         c.execute("INSERT INTO users (username, password) VALUES ('admin', 'admin')")
 
-    # Əgər flag yoxdursa, əlavə et
     c.execute("SELECT * FROM flags")
     if not c.fetchone():
         c.execute("INSERT INTO flags (flag) VALUES ('THM{sql_injection_success}')")
@@ -38,8 +40,12 @@ def login():
         password = request.form.get("password")
 
         query = f"SELECT * FROM users WHERE username = '{username}' AND password = '{password}'"
-        conn = sqlite3.connect("users.db")
+
+        BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+        db_path = os.path.join(BASE_DIR, 'users.db')
+        conn = sqlite3.connect(db_path)
         c = conn.cursor()
+
         try:
             c.execute(query)
             result = c.fetchone()
@@ -59,4 +65,3 @@ def login():
 if __name__ == "__main__":
     init_db()
     app.run(debug=True)
-    
